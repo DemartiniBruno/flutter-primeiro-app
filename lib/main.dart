@@ -46,61 +46,6 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
-/*class MyHomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    var pair = appState.current;
-
-    IconData icon;
-    if (appState.favorites.contains(pair)) {
-      icon = Icons.favorite;
-    } else {
-      icon = Icons.favorite_border;
-    }
-
-    return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-            //Text('A random Teste:'),
-            BigCard(pair: pair),
-            SizedBox(height: 10),
-            Row(
-             mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: (){
-                    appState.toogleFavorite();
-                  },
-                  icon: Icon(icon),
-                  label: const Text(
-                    'Like'
-                  ),
-                ),
-                SizedBox(width: 10,),
-                ElevatedButton(
-                  onPressed: (){
-                    appState.getNext();
-                  },
-                  child: Text(
-                    'Next'
-                  ),
-                ),
-              ],
-            )
-
-            ],
-          ),
-        ),
-    );
-  }
-}*/
-
-// ...
-
 class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -119,56 +64,137 @@ class _MyHomePageState extends State<MyHomePage> {
       case 1:
         page = FavoritesPage();
         break;
+      case 2:
+        page = DetailPage();
+        break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
     }
 
     return LayoutBuilder(
-      builder: (context, constraints) {
-        return Scaffold(
-          body: Row(
-            children: [
-              SafeArea(
-                child: NavigationRail(
-                  extended: constraints.maxWidth >= 600,
-                  destinations: [
-                    NavigationRailDestination(
-                      icon: Icon(Icons.home),
-                      label: Text('Home'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.favorite),
-                      label: Text('Favorites'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.favorite),
-                      label: Text('Favorites'),
-                    ),
-                  ],
-                  selectedIndex: selectedIndex,
-                  onDestinationSelected: (value) {
-                    setState(() {
-                      print(value);
-                      selectedIndex = value;
-                    });
-                  },
+        builder: (context, constraints) {
+          return Scaffold(
+            body: Row(
+              children: [
+                SafeArea(
+                  child: NavigationRail(
+                    extended: constraints.maxWidth >= 600,
+                    destinations: const [
+                      NavigationRailDestination(
+                        icon: Icon(Icons.home),
+                        label: Text('Home'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.favorite),
+                        label: Text('Favorites'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.favorite),
+                        label: Text('Favorites'),
+                      ),
+                    ],
+                    selectedIndex: selectedIndex,
+                    onDestinationSelected: (value) {
+                      setState(() {
+                        print(value);
+                        selectedIndex = value;
+                      });
+                    },
+                  ),
                 ),
-              ),
-              Expanded(
-                child: Container(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  child: page,
+                Expanded(
+                  child: Container(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    child: page,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
-      }
+              ],
+            ),
+          );
+        }
     );
   }
 
 }
 
+/*
+* Default structure of a StatefulWidget
+* */
+class DetailPage extends StatefulWidget{
+  const DetailPage({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _DetailPageState();
+}
+
+class _DetailPageState extends State<DetailPage>{
+  List<String> ListaTeste = [];
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  TextEditingController emailController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        
+        Expanded(
+          child: ListView(
+            children: [
+              for (var pair in ListaTeste)
+                ListTile(
+                  title: Text(pair),
+                ),
+            ],
+          ),
+        ),
+        Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 200,
+                  child: TextFormField(
+                    controller: emailController,
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Digite o e-mail';
+                      }
+                      return null;
+                    },
+                    decoration: const InputDecoration(
+                      hintText: 'Teste',
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                ElevatedButton(
+                    onPressed: (){
+                      if(_formKey.currentState!.validate()){
+                        setState(() {
+                          ListaTeste.add(emailController.text);
+                        });
+                      }
+                    },
+                    child: Text('Submit'))
+              ],
+            ),
+        ),
+      ],
+    );
+
+  }
+
+}
+
+/*
+* --------
+* */
 class FavoritesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -272,3 +298,4 @@ class BigCard extends StatelessWidget {
     );
   }
 }
+
